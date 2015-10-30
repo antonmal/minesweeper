@@ -4,7 +4,6 @@ class Board
     validate(input)
 
     board = input.map(&:chars)
-
     board.each_with_index do |line, y|
       line.each_with_index do |cell, x|
         next if "*|-+".include? cell
@@ -25,7 +24,7 @@ class Board
 
   def self.validate(input)
     unless input.all? { |line| line.length == input.first.length }
-      fail ValueError, "Lines should be of the same length"
+      fail ValueError,  "Lines should be of the same length"
     end
     unless input.all? { |line| line =~ /[\+\-]+/ || line =~ /\A\|.+\|\z/ }
       fail ValueError,  "Uninterrupted borders made with '|', '+' and '-' " \
