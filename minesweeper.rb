@@ -44,8 +44,8 @@ class Board
   end
 
   def self.board_surrounded_by_border?
-    @input.first  =~ /\A\+[\-]+\+\z/ ||
-    @input.last   =~ /\A\+[\-]+\+\z/ ||
+    @input.first  =~ /\A\+[\-]+\+\z/ &&
+    @input.last   =~ /\A\+[\-]+\+\z/ &&
     @input[1..-2].all? { |line| line =~ /\A\|.+\|\z/ }
   end
 
