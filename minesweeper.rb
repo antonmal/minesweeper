@@ -1,19 +1,15 @@
 class Board
 
   def self.transform(input)
-    validate(input)
+    @input = input
+    validate_input
 
-    board = input.map(&:chars)
-    board.each_with_index do |line, y|
-      line.each_with_index do |cell, x|
-        next if "*|-+".include? cell
-        mines_around = 0
-        (-1..1).each do |i|
-          (-1..1).each do |j|
-            mines_around += 1 if board[y+j][x+i] == "*"
-          end
+    board = @input.map(&:chars)
+    board.each_with_index do |line, x|
+      line.each_with_index do |cell, y|
+        if cell == ' '
+          board[x][y] = mines_around(x, y)
         end
-        board[y][x] = mines_around.to_s unless mines_around == 0
       end
     end
 
@@ -22,20 +18,44 @@ class Board
 
   private
 
-  def self.validate(input)
-    unless input.all? { |line| line.length == input.first.length }
+  def self.mines_around(x, y)
+    mines = 0
+    board = @input.map(&:chars)
+    (-1..1).each do |i|
+      (-1..1).each do |j|
+        mines += 1 if board[x+i][y+j] == '*'
+      end
+    end
+    mines == 0 ? ' ' : mines.to_s
+  end
+
+  def self.validate_input
+    unless board_lines_have_the_same_length?
       fail ValueError,  "Lines should be of the same length"
     end
-    unless input.all? { |line| line =~ /[\+\-]+/ || line =~ /\A\|.+\|\z/ }
-      fail ValueError,  "Uninterrupted borders made with '|', '+' and '-' " \
+    unless board_surrounded_by_border?
+      fail ValueError,  "Uninterrupted border made with '|', '+' and '-' " \
                         "should surround the board"
     end
-    unless input.all? { |line| line =~ /[\+\-]+/ || line =~ /\A\|[ \*]+\|\z/ }
+    unless board_contains_valid_chars_only?
       fail ValueError,  "Inside the borders only ' ' or '*' " \
                         "characters are allowed"
     end
   end
 
+  def self.board_lines_have_the_same_length?
+    @input.all? { |line| line.length == @input.first.length }
+  end
+
+  def self.board_surrounded_by_border?
+    @input.first  =~ /\A\+[\-]+\+\z/ ||
+    @input.last   =~ /\A\+[\-]+\+\z/ ||
+    @input[1..-2].all? { |line| line =~ /\A\|.+\|\z/ }
+  end
+
+  def self.board_contains_valid_chars_only?
+    @input[1..-2].all? { |line| line =~ /\A\|[ \*]+\|\z/ }
+  end
 end
 
 class ValueError < ArgumentError; end
