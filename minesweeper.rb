@@ -3,16 +3,12 @@ class Board
   def self.transform(input)
     @input = input
     validate_input
-
     board = @input.map(&:chars)
     board.each_with_index do |line, x|
-      line.each_with_index do |cell, y|
-        if cell == ' '
-          board[x][y] = mines_around(x, y)
-        end
+      line.map!.with_index do |cell, y|
+        cell == ' ' ? mines_around(x, y) : cell
       end
     end
-
     board.map(&:join)
   end
 
