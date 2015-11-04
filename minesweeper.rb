@@ -4,11 +4,11 @@ class Board
   def initialize(input)
     @input = input
     @cells = input.map(&:chars)
+    self.validate
   end
 
   def self.transform(input)
     board = Board.new(input)
-    board.validate
     board.cells.map.with_index do |line, x|
       line.map.with_index do |cell, y|
         cell == ' ' ? board.mines_around(x, y) : cell
