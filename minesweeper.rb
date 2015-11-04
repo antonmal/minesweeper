@@ -1,31 +1,32 @@
 class Board
+  attr_reader :input, :cells
 
-  def self.transform(input)
+  def initialize(input)
     @input = input
-    validate_input
-    board = @input.map(&:chars)
-    board.each_with_index do |line, x|
-      line.map!.with_index do |cell, y|
-        cell == ' ' ? mines_around(x, y) : cell
-      end
-    end
-    board.map(&:join)
+    @cells = input.map(&:chars)
   end
 
-  private
+  def self.transform(input)
+    board = Board.new(input)
+    board.validate
+    board.cells.map.with_index do |line, x|
+      line.map.with_index do |cell, y|
+        cell == ' ' ? board.mines_around(x, y) : cell
+      end
+    end.map(&:join)
+  end
 
-  def self.mines_around(x, y)
+  def mines_around(x, y)
     mines = 0
-    board = @input.map(&:chars)
     (-1..1).each do |i|
       (-1..1).each do |j|
-        mines += 1 if board[x+i][y+j] == '*'
+        mines += 1 if cells[x+i][y+j] == '*'
       end
     end
     mines == 0 ? ' ' : mines.to_s
   end
 
-  def self.validate_input
+  def validate
     unless board_lines_have_the_same_length?
       fail ValueError,  "Lines should be of the same length"
     end
@@ -39,18 +40,18 @@ class Board
     end
   end
 
-  def self.board_lines_have_the_same_length?
-    @input.all? { |line| line.length == @input.first.length }
+  def board_lines_have_the_same_length?
+    input.all? { |line| line.length == input.first.length }
   end
 
-  def self.board_surrounded_by_border?
-    @input.first  =~ /\A\+[\-]+\+\z/ &&
-    @input.last   =~ /\A\+[\-]+\+\z/ &&
-    @input[1..-2].all? { |line| line =~ /\A\|.+\|\z/ }
+  def board_surrounded_by_border?
+    input.first  =~ /\A\+[\-]+\+\z/ &&
+    input.last   =~ /\A\+[\-]+\+\z/ &&
+    input[1..-2].all? { |line| line =~ /\A\|.+\|\z/ }
   end
 
-  def self.board_contains_valid_chars_only?
-    @input[1..-2].all? { |line| line =~ /\A\|[ \*]+\|\z/ }
+  def board_contains_valid_chars_only?
+    input[1..-2].all? { |line| line =~ /\A\|[ \*]+\|\z/ }
   end
 end
 
